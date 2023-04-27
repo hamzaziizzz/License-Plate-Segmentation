@@ -18,7 +18,7 @@ import numpy as np
 from utils.augmentations import letterbox
 from send_mail import prepare_and_send_email
 from utils.general import (check_img_size, non_max_suppression, scale_coords)
-from utils.plots import Annotator, colors, save_one_box
+from utils.plots import Annotator, colors, plot_one_box, save_one_box
 from utils.segment.general import process_mask, scale_masks
 from utils.segment.plots import plot_masks
 from utils.torch_utils import select_device
@@ -44,7 +44,7 @@ opt = {
     "yaml": "data/custom_data.yaml",
     "img-size": 160,  # default image size
     "conf-thres": 0.25,  # confidence threshold for inference.
-    "iou-thres": 0.45,  # NMS IoU threshold for inference.
+    "iou-thres": 0.25,  # NMS IoU threshold for inference.
     "device": 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
     "classes": classes_to_filter  # list of classes to filter or None
 }
@@ -168,8 +168,8 @@ def video_segmentation(conf_=0.25, frames_buffer=None):
                 proto = out[1]
                 # print("proto: ", proto)
 
-                # pred = non_max_suppression(pred, conf_thres=conf_, iou_thres=opt["iou-thres"], labels=0)
-                # print("2: ", pred)
+                pred = non_max_suppression(pred, conf_thres=conf_, iou_thres=opt["iou-thres"], labels=0)
+                print("2: ", pred)
 
                 s = ''
                 # Process predictions
@@ -205,8 +205,9 @@ def video_segmentation(conf_=0.25, frames_buffer=None):
                             c = int(cls)  # integer class
                             label = f'{names[c]} {conf:.2f}'
                             print(label)
-                            annotator.box_label(xyxy, label, color=colors(c, True))
-                            save_one_box(xyxy, img0, file="predictions/segment.jpg")
+                            annotator.box_label(xyxy, label, color=(0, 255, 0))
+                            # save_one_box(xyxy, img0, file="predictions/segment.jpg")
+                            plot_one_box(xyxy, img0, label=label, color=(0, 255, 0), line_thickness=3)
 
                     frame_count += 1
                     tock = time.time()

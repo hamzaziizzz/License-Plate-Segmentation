@@ -665,3 +665,7 @@ app_old.py
 
 # Model Weights
 best.pt
+
+# Video Files
+static/video/
+static/files
