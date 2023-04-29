@@ -19,7 +19,7 @@ app.config["VIDEO_UPLOADS"] = "static/video"
 app.config["ALLOWED_VIDEO_EXTENSIONS"] = ["MP4", "MOV", "AVI", "WMV"]
 
 # secret key for the session
-app.config['SECRET_KEY'] = 'ppe_violation_detection'
+app.config['SECRET_KEY'] = 'license_plate_segmentation'
 
 # global variables
 frames_buffer = []  # buffer to store frames from a stream
@@ -121,7 +121,7 @@ def video_processed():
         Response: a response object containing the processed video stream
     """
     # default confidence threshold
-    conf = 0.75
+    conf = 0.25
     return Response(generate_processed_frames(conf_=conf), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 

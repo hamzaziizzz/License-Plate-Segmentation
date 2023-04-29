@@ -13,6 +13,7 @@ import time
 
 import torch
 import numpy as np
+import cv2
 
 # from models.common import DetectMultiBackend
 from utils.augmentations import letterbox
@@ -42,10 +43,10 @@ classes_to_filter = []
 opt = {
     "weights": "best.pt",  # Path to weights file default weights are for nano model
     "yaml": "data/custom_data.yaml",
-    "img-size": 160,  # default image size
+    "img-size": 640,  # default image size
     "conf-thres": 0.25,  # confidence threshold for inference.
     "iou-thres": 0.25,  # NMS IoU threshold for inference.
-    "device": 'cpu',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
+    "device": '0',  # device to run our model i.e. 0 or 0,1,2,3 or cpu
     "classes": classes_to_filter  # list of classes to filter or None
 }
 
@@ -168,8 +169,8 @@ def video_segmentation(conf_=0.25, frames_buffer=None):
                 proto = out[1]
                 # print("proto: ", proto)
 
-                pred = non_max_suppression(pred, conf_thres=conf_, iou_thres=opt["iou-thres"], labels=0)
-                print("2: ", pred)
+                pred = non_max_suppression(pred, conf_thres=conf_, iou_thres=opt["iou-thres"], labels=0, agnostic=False, max_det=1000, nm=32)
+                # print("2: ", pred)
 
                 s = ''
                 # Process predictions
@@ -200,14 +201,17 @@ def video_segmentation(conf_=0.25, frames_buffer=None):
                         annotator.im = scale_masks(img.shape[2:], im_masks, img0.shape)  # scale to original h, w
                         # Mask plotting --------------------------------------------------------------------------------
 
+                        # i = 0
                         for *xyxy, conf, cls in reversed(det[:, :6]):
                             print("Hello")
                             c = int(cls)  # integer class
                             label = f'{names[c]} {conf:.2f}'
                             print(label)
                             annotator.box_label(xyxy, label, color=(0, 255, 0))
-                            # save_one_box(xyxy, img0, file="predictions/segment.jpg")
+                            # save_one_box(xyxy, img0, file=f"static/predictions/segment_{i}.jpg")
+                            # i += 1
                             plot_one_box(xyxy, img0, label=label, color=(0, 255, 0), line_thickness=3)
+                            # img0 = cv2.addWeighted(img0, 0.8, masks, 0.2, 0)
 
                     frame_count += 1
                     tock = time.time()
